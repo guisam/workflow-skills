@@ -1,8 +1,9 @@
-# Project adapter design (proposal)
+# Project adapter design
 
-Status: **Proposal.** Nothing here is supported Agent Profiles (AP) syntax yet.
-The file name `agents.local.yaml` and the key `adapter` are placeholders.
+Status: **Implemented on an unmerged Agent-Profiles branch** (`feat/85-project-adapter`,
+stacked on PR #95). Not released. The live Agent-Profiles checkout has not been migrated.
 Governing issue: [Agent-Profiles#85](https://github.com/guisam/Agent-Profiles/issues/85).
+Product contract: Agent-Profiles `docs/project-adapter.md` on that branch.
 
 ## Goal
 
@@ -12,110 +13,84 @@ portable. Another project's pins never move as a side effect.
 
 ```text
 workflow-skills          → signed packages in the local library (by name@version)
-agent-profiles-config    → selection, pins, lock and approvals for Agent-Profiles only
+agent-profiles-config    → additions, lock and approvals for Agent-Profiles only
 Agent-Profiles           → committed portable defaults + one ignored reference
 ```
 
-## Key decision: the adapter does not reference the workshop
+The adapter names packages and versions only. It contains no path to
+workflow-skills.
 
-Packages already reach projects through the local library by `name@version` and
-digest. The adapter names packages and versions only. It contains no path to
-workflow-skills. This avoids cross-repository path resolution. The workshop can
-move, or be absent once its packages are published to the library.
+## Decisions
 
-## Connection point
+### Assignment precedence: ownership, not ranking
 
-The project has one ignored file, for example `.agent-profiles/agents.local.yaml`:
+Every binding and every assignment belongs to exactly one layer. The adapter may:
 
-```yaml
-adapter: ../agent-profiles-config   # relative to the project root, or absolute
-```
-
-- Exactly one adapter per project. An adapter cannot reference another adapter.
-- No local file: AP uses committed configuration only. This is the clean-checkout path.
-- A local file that references a missing or invalid adapter is an error. The
-  error names the path and the remedy: fix the reference, or delete the local file
-  to use the committed defaults. AP never falls back silently.
-
-## Adapter contents
-
-```text
-agent-profiles-config/
-  agents.yaml            overlay: skills pins, role skill additions, extra roles/profiles
-  roles/ profiles/       bodies for roles and profiles the adapter adds
-  agent-profiles.lock    lock entries for adapter-selected packages
-  approvals/             signed approvals for those packages
-```
-
-Relative paths inside the adapter resolve against the adapter root. The project
-root, Git root, project identity and MCP `--root` remain the project's.
-
-## Composition and precedence
-
-The committed project configuration is the base. The adapter may:
-
-- add skill pins under new skill IDs;
-- add skills to an existing role's `required` or `available` lists;
-- add new roles and profiles.
+- add package-bound skills under new IDs;
+- append skills to a project role's `required`/`available` lists;
+- add roles, with a file in the adapter or a package;
+- add assignments that select only bindings the adapter declares.
 
 The adapter may not:
 
-- replace or remove a project role, profile, or skill pin. Defining the same skill
-  ID with a different package or version is a conflict error, not an override;
-- change project governing instructions (`AGENTS.md`, `CLAUDE.md`, bootstrap blocks);
-- widen trust. Effective trust is the intersection of machine and project trust
-  policy. An adapter `trust.yaml`, if supported, can only narrow it.
+- redeclare any project entry;
+- change a project role's instructions;
+- shadow a project file;
+- assign versions to a project binding;
+- set defaults, `models`, `families`, `profiles` or `workflow_links`.
 
-Open question: whether the adapter may set `default_role`. The first slice says no.
+Within a layer, AP's existing rule is unchanged: a matching strict-superset
+selector wins, and incomparable or duplicate rules are refused. Ownership is
+exclusive, so no rule ever compares across layers. A cross-layer tie is
+impossible by construction.
 
-## Writes, locks and freshness
+Consequence: the adapter cannot give a project-owned skill a model-specific
+variant, and it cannot declare models. Those changes belong in the project.
 
-- With an adapter configured, `install` and `update --apply` write adapter-selected
-  entries to the adapter's lock and approvals. They never write the project's
-  committed lock or approvals.
-- The effective lock is the project lock plus the adapter lock. Validation covers both.
-- Update-preview freshness (`--expect`) covers every contributing input: project
-  `agents.yaml` and lock, the local reference file, and adapter `agents.yaml` and lock.
-- `resolve` (CLI and MCP), `inspect`, `doctor`, `explain`, stamps and update
-  previews use the same composed configuration. Each selection shows its source:
-  `project` or `adapter:<path>`.
+### Signing stays separate from install and update
 
-## Host configuration stays host-owned
+- `install` writes only the adapter lock. Neither `install` nor `update` signs or
+  writes approvals; unapproved packages are refused or withheld under policy.
+- `library approve` is the only signing command. In adapter mode it records the
+  approval in the adapter's `approvals/`.
+- Verification reads project and adapter approvals. The signed payload names the
+  package, version and digest, not a path. Migration therefore copies the five
+  existing approvals byte for byte, and they verify without re-signing.
 
-The adapter does not install or enforce host settings: `.mcp.json`, `.codex/`,
-`.claude/settings*.json`, plugins, permissions or hooks. Those remain explicit
-per host. Today, both Agent-Profiles' and workflow-skills' MCP configuration run
-the AP executable from `workflow-skills/node_modules`. That dependency is
-machine-local and outside this design.
+### Snapshot-backed migration and rollback
 
-## Packaging
+`scripts/adapter-migration.mjs` (this repository):
 
-The local reference file is never packaged. Since AP 0.19.10 (branch
-`fix/85-package-artifact-allowlist`), `package.json` lists each shipped template
-by name. `test/package-files.test.js` places sentinel files, including
-`agents.local.yaml`, beside the templates and checks that none reach the tarball.
-The allowlist does not protect the contents of shipped templates. Publish from CI
-or a clean checkout.
+| Step | What it does | Refuses or rolls back when |
+| --- | --- | --- |
+| `snapshot` | Copies and hashes `.agent-profiles/**` and host files. Records the resolution of every role × (no model, `claude-opus-5-5`, declared models) × (no host, claude, codex) and the approval status of each pinned package | The snapshot directory is not empty, or a local reference exists |
+| `migrate` | Writes the overlay, added role files and approval bytes to the adapter. Restores the committed `agents.yaml`, removes moved files, adds the reference, runs `install` and compares everything with the snapshot | Live files drifted since the snapshot; the live adoption is not expressible as additions; any resolution or approval differs (automatic byte rollback) |
+| `verify` | Compares current resolutions and approvals with the snapshot | Any difference |
+| `rollback` | Restores snapshot bytes, removes the reference and verifies | A snapshot copy fails its hash, or resolution still differs |
 
-## Migration of the current Agent-Profiles dogfood setup
+Host files (`.mcp.json`, `.codex/`, `.claude/`, `AGENTS.md`, `CLAUDE.md`) are
+snapshotted but never changed. `permissions.json` is left in place.
 
-1. Create `agent-profiles-config`. Move AP's local adoption into it: Ponytail and
-   shared-technical-language pins, the auditor and maintainer roles, lock entries
-   and approvals.
-2. Restore AP's committed `.agent-profiles/` to `origin/main`.
-3. Add the ignored local reference file to the AP checkout.
-4. Verify that resolve output for each role matches the pre-migration output.
-5. Rollback: delete the local reference file. AP returns to committed defaults.
-   The adapter repository is unchanged and can be reconnected.
+## Evidence (2026-11-09)
 
-Steps 1-3 require AP support for the local layer, and explicit authorization to
-change AP's active configuration.
-
-## Acceptance (from #85)
-
-- Committed-only and adapter operation, missing or invalid adapter, and conflicting
-  values are documented and tested.
-- Two consumer projects with independent adapters keep independent pins and show
-  source provenance.
-- A stale update preview is refused when any contributing input changed.
-- Migration and rollback lose no repository policy or unrelated work.
+- AP branch tests: `test/adapter.test.js` has 9 tests and all pass. They cover:
+  - committed-only operation;
+  - v1 + v2 composition that writes only the adapter lock;
+  - staleness;
+  - missing or invalid reference;
+  - override refusals;
+  - assignment ownership;
+  - two projects with independent pins;
+  - the update gate;
+  - approve-to-adapter and union verification.
+- Rehearsal on a disposable clone of the live Agent-Profiles checkout with its exact
+  dogfood `.agent-profiles/`:
+  - Migration: 50/50 resolutions and approval statuses were identical.
+  - The five approvals were copied byte for byte and still verify.
+  - Negative checks: a reordered skill list and a missing signature were both detected.
+  - Rollback restored the project byte for byte to the live state.
+- The machine trust policy has `require_approval: false`. Resolution therefore does
+  not withhold unapproved packages, so approvals are checked separately with
+  approval required.
+- Not covered: paid or live model sessions, or host MCP restarts against the adapter
+  build.

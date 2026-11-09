@@ -7,15 +7,15 @@ This repository is the **workshop** layer described in
 
 ```text
 workflow-skills (workshop: skill sources, packages, checks)
-  → <project>-config (adapter: selects and pins packages for one project; proposed)
+  → <project>-config (adapter: adds pins and roles for one project; unreleased AP branch)
     → project (product: owns its governing instructions and portable defaults)
 ```
 
 The workshop owns skill text, supporting references, package manifests,
 provenance, portability checks and usage examples. Agent Profiles (AP) delivers
 signed packages from the local library. Each consuming project selects and pins
-versions independently. The adapter layer is a proposal; see
-[adapter design](docs/adapter-design.md).
+versions independently. The adapter layer is implemented on an unmerged AP branch;
+see [adapter design](docs/adapter-design.md).
 
 Consuming projects must not depend on this repository's own `.agent-profiles/`
 directory. It is the workshop's own dogfood configuration, not a default for
@@ -69,3 +69,5 @@ node scripts/test-superpowers.mjs
   explicit updates and rollback. See the [runbook](docs/ponytail-experiment.md).
 - `test-superpowers.mjs`: builds the Superpowers role trial project. Requires
   Superpowers 7.0.2 at a pinned commit and npm access.
+- `adapter-migration.mjs`: snapshot, migrate, verify and roll back a project's
+  local adoption into an adapter. See [adapter design](docs/adapter-design.md).
