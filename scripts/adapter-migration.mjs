@@ -2,13 +2,14 @@
 // Snapshot-backed migration of a project's local AP adoption into an external
 // adapter (Agent-Profiles#85), with resolve-equivalence checks and byte rollback.
 //
-//   node scripts/adapter-migration.mjs snapshot <project> <snapshot> --ap <AP checkout>
+//   node scripts/adapter-migration.mjs snapshot <project> <snapshot> --ap <AP checkout or package>
 //   node scripts/adapter-migration.mjs migrate  <project> <snapshot> <adapter> --ap <AP checkout>
 //   node scripts/adapter-migration.mjs rollback <project> <snapshot> --ap <AP checkout>
 //   node scripts/adapter-migration.mjs verify   <project> <snapshot> --ap <AP checkout>
 //
-// The AP checkout supplies the adapter-aware resolver and must be the same for the
-// snapshot and the checks, so only the configuration layout differs. Nothing here
+// --ap names the AP that resolves: a source checkout or an installed package. Use the
+// live version for the snapshot, `verify` with the new version to isolate the upgrade,
+// then `migrate` with an adapter-aware version (0.20.0 or later). Nothing here
 // signs, publishes or changes trust: approval files are copied byte for byte.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -59,11 +60,17 @@ const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const posix = (file) => file.split(path.sep).join("/");
 const git = (...rest) =>
 	execFileSync("git", ["-C", project, ...rest], { encoding: "utf8" });
-const load = (file) =>
-	import(pathToFileURL(path.join(fs.realpathSync(ap), file)).href);
-const { resolveInstructions } = await load("src/resolve.ts");
-const { approvalStatus } = await load("src/approvals.ts");
-const { loadTrustPolicy } = await load("src/trust.ts");
+// --ap is a source checkout (src/*.ts) or an installed package (dist/src/*.js).
+const apRoot = fs.realpathSync(ap);
+const source = fs.existsSync(path.join(apRoot, "src/resolve.ts"));
+const module = (name) =>
+	path.join(apRoot, source ? `src/${name}.ts` : `dist/src/${name}.js`);
+const cli = path.join(apRoot, source ? "bin/agent-profiles.ts" : "dist/bin/agent-profiles.js");
+const load = (name) => import(pathToFileURL(module(name)).href);
+const { resolveInstructions } = await load("resolve");
+const { approvalStatus } = await load("approvals");
+const { loadTrustPolicy } = await load("trust");
+const apVersion = JSON.parse(fs.readFileSync(path.join(apRoot, "package.json"), "utf8")).version;
 
 function files(root, dir) {
 	const out = [];
@@ -135,7 +142,7 @@ function takeSnapshot() {
 		throw new Error(`${snapshot} exists and is not empty; choose a new snapshot directory`);
 	if (fs.existsSync(path.join(project, LOCAL)))
 		throw new Error(`${LOCAL} exists; snapshot the pre-adapter state only`);
-	const manifest = { project, head: git("rev-parse", "HEAD").trim(), created: new Date().toISOString(), files: {}, host: {} };
+	const manifest = { project, head: git("rev-parse", "HEAD").trim(), created: new Date().toISOString(), ap: { root: apRoot, version: apVersion }, files: {}, host: {} };
 	for (const file of files(project, AP_DIR)) {
 		const bytes = fs.readFileSync(path.join(project, file));
 		manifest.files[file] = sha(bytes);
@@ -228,6 +235,7 @@ function compare(expected, label) {
 	const keys = [...new Set([...Object.keys(expected), ...Object.keys(actual)])].sort();
 	const differences = keys.filter((key) => JSON.stringify(expected[key]) !== JSON.stringify(actual[key]));
 	write(path.join(snapshot, `resolutions-${label}.json`), actual);
+	console.log(`${label}: compared with AP ${apVersion} (${apRoot})`);
 	return { checked: keys.length, differences, actual };
 }
 
@@ -270,7 +278,7 @@ function migrate() {
 		removeEmpty(path.join(project, AP_DIR, "approvals"));
 		fs.writeFileSync(path.join(project, LOCAL), stringify({ adapter: posix(path.relative(project, adapter)) }));
 		// 3. Lock for the composed configuration, written to the adapter from the store.
-		execFileSync(process.execPath, [path.join(fs.realpathSync(ap), "bin/agent-profiles.ts"), "install", "--root", project, "--offline"], { stdio: "inherit" });
+		execFileSync(process.execPath, [cli, "install", "--root", project, "--offline"], { stdio: "inherit" });
 		// 4. Same resolution for every role x model x host, or roll back.
 		const { checked, differences } = compare(expected, "migrated");
 		if (differences.length) throw new Error(`resolution differs for ${differences.length}/${checked}: ${differences.slice(0, 5).join("; ")}`);

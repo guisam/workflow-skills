@@ -1,7 +1,9 @@
 # Project adapter design
 
-Status: **Implemented on an unmerged Agent-Profiles branch** (`feat/85-project-adapter`,
-stacked on PR #95). Not released. The live Agent-Profiles checkout has not been migrated.
+Status: **Implemented for AP 0.20.0 on an unmerged branch** (PR #96, stacked on
+PR #95). Not released. The live Agent-Profiles checkout has not been migrated; see
+the [live migration checklist](live-migration-checklist.md). Follow-ups:
+Agent-Profiles#97 (guarded updates) and #98 (stamps and evidence).
 Governing issue: [Agent-Profiles#85](https://github.com/guisam/Agent-Profiles/issues/85).
 Product contract: Agent-Profiles `docs/project-adapter.md` on that branch.
 
@@ -44,8 +46,15 @@ selector wins, and incomparable or duplicate rules are refused. Ownership is
 exclusive, so no rule ever compares across layers. A cross-layer tie is
 impossible by construction.
 
-Consequence: the adapter cannot give a project-owned skill a model-specific
-variant, and it cannot declare models. Those changes belong in the project.
+Exact-model selection (0.20.0): an adapter assignment may name an exact model ID
+the project does not declare, for adapter-owned bindings only. Routing stays the
+project's. Only the exact host-stated ID selects the rule. No model, another model,
+a near match, a prefix or a different case keeps the adapter's baseline pin. A
+project alias is refused. Validation checks each adapter-named model under the
+default and every family profile, so ambiguity is refused before any session.
+
+Consequence: the adapter cannot give a *project-owned* skill a model-specific
+variant, and it cannot route models. Those changes belong in the project.
 
 ### Signing stays separate from install and update
 
