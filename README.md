@@ -2,58 +2,70 @@
 
 Reusable workflow skills maintained independently of their consuming projects.
 
-Agent Profiles supplies versioned local packages and project-specific selection.
-This repository owns the skill text, supporting references, package manifests,
-portability checks, and usage examples.
+This repository is the **workshop** layer described in
+[Agent-Profiles#85](https://github.com/guisam/Agent-Profiles/issues/85):
 
-## First milestone
+```text
+workflow-skills (workshop: skill sources, packages, checks)
+  → <project>-config (adapter: selects and pins packages for one project; proposed)
+    → project (product: owns its governing instructions and portable defaults)
+```
 
-Extract Fraiche's shared technical-language skill into a portable package, then
-demonstrate that two disposable projects can consume the same version, detect an
-update, adopt it explicitly, and restore an earlier version independently.
+The workshop owns skill text, supporting references, package manifests,
+provenance, portability checks and usage examples. Agent Profiles (AP) delivers
+signed packages from the local library. Each consuming project selects and pins
+versions independently. The adapter layer is a proposal; see
+[adapter design](docs/adapter-design.md).
 
-Fraiche remains unchanged until a reviewed integration is authorized. A successful
-packaging check establishes mechanics, not model effectiveness or T3 host support.
+Consuming projects must not depend on this repository's own `.agent-profiles/`
+directory. It is the workshop's own dogfood configuration, not a default for
+other projects.
 
-## Source and product boundaries
+## Catalog
 
-- Initial source: `C:\workspace\fraiche\.agents\skills\adr-ste\SKILL.md`.
+| Status | Package or asset | Notes |
+| --- | --- | --- |
+| Stable, signed, adopted | `@local/shared-technical-language@1.0.0` | Extracted from Fraiche `adr-ste`; see [extraction](docs/extraction.md) |
+| Stable, signed, adopted | `@local/ponytail-implementation@1.0.0`, `ponytail-review`, `ponytail-audit`, `ponytail-debt` (all 1.0.0) | Derived from Ponytail (MIT); see [experiment](docs/ponytail-experiment.md) |
+| Trial only | [Superpowers role trial](experiments/superpowers/README.md): coordinator (orchestration), implementer (TDD), reviewer | Generated into `.scratch/` by `scripts/test-superpowers.mjs`; not packaged or signed |
+| External reference | `agent-profiles-superpowers` companion ([Agent-Profiles#88](https://github.com/guisam/Agent-Profiles/issues/88)) | Superpowers packages and model variants; unsigned, no variant adopted. Reference it; do not copy it here |
+
+Only stable, signed packages are candidates for an adapter to select. A trial
+asset becomes a candidate only after it is packaged, reviewed, signed and validated.
+
+Signed stable packages are in the live local library and adopted by
+Agent-Profiles and workflow-skills; see the [local cutover record](docs/local-cutover.md).
+Both projects' host MCP configurations run the AP executable from this
+repository's `node_modules`. Run `npm ci` here to restore it.
+
+## Boundaries
+
 - Keep project policy and workflow authority in each consuming repository.
-- Propose general Agent Profiles improvements separately with a minimal reproducer.
 - Keep skill-development commits in this repository.
+- Propose general Agent Profiles improvements separately, with a minimal reproducer.
+- Fraiche remains unchanged until a reviewed integration is authorized.
+- A successful packaging check establishes mechanics, not model effectiveness or
+  host support.
 
-This is a local repository. Signed stable packages are now in the live local
-library and adopted by Agent-Profiles and workflow-skills; see the
-[local cutover record](docs/local-cutover.md). Remote publication and paid
-evaluation have not been performed. Derived
-Ponytail packages retain upstream's MIT license; no repository-wide license or
-license for the Fraiche extraction has been selected.
+This repository is private. Packages have not been published remotely, and no
+paid evaluation has been run. Derived Ponytail packages retain upstream's MIT
+license. No repository-wide license, and no license for the Fraiche extraction,
+has been selected.
 
-## Local extraction
+## Validate
 
-- [Shared technical-language skill](packages/shared-technical-language/SKILL.md)
-- [AP package manifest](packages/shared-technical-language/package.yaml)
-- [Provenance, adaptations, validation, and demo next steps](docs/extraction.md)
-
-The package uses the local-only identity `@local/shared-technical-language@1.0.0`.
-No public namespace ownership or license is asserted. Run the isolated AP check
-with Node 24:
+Run the checks with Node 24 against an Agent-Profiles checkout. They use isolated
+stores under `.scratch/` and do not change the live library or any active project.
 
 ```powershell
 node scripts/validate-package.mjs C:\workspace\Agent-Profiles
-```
-
-## Ponytail role experiment
-
-Four Ponytail skills now have AP packages: implementation, review, audit, and debt.
-The [experiment and live-test runbook](docs/ponytail-experiment.md) records their
-provenance, role assignments, checks, and remaining host validation.
-
-```powershell
 node scripts/import-ponytail.mjs C:\workspace\ponytail --check
 node scripts/test-ponytail.mjs C:\workspace\Agent-Profiles
+node scripts/test-superpowers.mjs
 ```
 
-The experiment creates two projects and one library under `.scratch/`, with
-isolated trust settings. It verifies role selection, MCP delivery, explicit
-updates, and rollback without changing any active project or native plugin.
+- `validate-package.mjs`: shared technical-language package structure.
+- `test-ponytail.mjs`: two projects and one library; role selection, MCP delivery,
+  explicit updates and rollback. See the [runbook](docs/ponytail-experiment.md).
+- `test-superpowers.mjs`: builds the Superpowers role trial project. Requires
+  Superpowers 7.0.2 at a pinned commit and npm access.

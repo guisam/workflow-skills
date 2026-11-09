@@ -2,9 +2,16 @@
 
 ## Scope
 
-Maintain reusable skills and their packaging in this repository. Agent-Profiles
-and Fraiche are read-only references unless the user separately authorizes edits.
-Use disposable consumer projects for integration checks.
+This repository is the workshop layer (Agent-Profiles#85): it maintains reusable
+skills, their packaging, provenance and checks. Consuming projects and their
+adapters select and pin packages; they own their own policy. Agent-Profiles,
+Fraiche and agent-profiles-superpowers are read-only references unless the user
+separately authorizes edits. Use disposable consumer projects for integration checks.
+
+Keep the README catalog current. Distinguish stable signed packages from trial-only
+experiments and external references. Do not present a trial asset as selectable
+until it is packaged, reviewed, signed and validated. This repository's own
+`.agent-profiles/` is its dogfood configuration, not a default for other projects.
 
 ## Extraction
 
@@ -13,9 +20,10 @@ workflow labels, and tool assumptions before adapting it. Record source provenan
 and distinguish reusable behavior from project-specific contracts. Preserve
 authority, approval gates, conditions, and evidence limits.
 
-Start with `adr-ste` from `C:\workspace\fraiche\.agents\skills\adr-ste\SKILL.md`.
-Keep the first package self-contained. Defer ticket-review and orchestration skills
-until their supporting contracts have been mapped.
+Keep each package self-contained. Before packaging an orchestration or ticket-review
+skill, map its supporting contracts (handoffs, ledgers, scripts, role boundaries).
+Reference the agent-profiles-superpowers companion for Superpowers packages and
+model variants; do not duplicate it here.
 
 ## Validation and delivery
 
@@ -25,7 +33,11 @@ package or dependency merely to store Markdown skills. Use an isolated store for
 checks; preserve the user's live library and signing configuration.
 
 Report structural validation separately from live agent behavior and model quality.
-Public hosting, skill publication to the user's library, changes to active project
+Commit only reviewed paths; never `git add -A`. Keep machine-local settings,
+scratch output and raw evidence ignored. Keep LF line endings (`.gitattributes`):
+signed approvals cover file digests.
+
+This repository is private. Public hosting, skill publication to the user's library, changes to active project
 configuration, signing, and paid model runs require explicit user authorization.
 Do not select a public license on the user's behalf.
 <!-- agent-profiles:start -->

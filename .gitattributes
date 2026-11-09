@@ -1,0 +1,2 @@
+# Keep package bytes identical on every checkout: approvals sign SHA-256 digests.
+* text=auto eol=lf
