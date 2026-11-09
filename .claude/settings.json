@@ -1,0 +1,59 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --no agent-profiles resolve:*)",
+      "PowerShell(npx --no agent-profiles resolve:*)"
+    ],
+    "deny": [
+      "Bash(npx --no agent-profiles library publish:*)",
+      "PowerShell(npx --no agent-profiles library publish:*)",
+      "Bash(npx --no agent-profiles library approve:*)",
+      "PowerShell(npx --no agent-profiles library approve:*)",
+      "Bash(npx --no agent-profiles add:*)",
+      "PowerShell(npx --no agent-profiles add:*)",
+      "Bash(npx --no agent-profiles install:*)",
+      "PowerShell(npx --no agent-profiles install:*)",
+      "Bash(npx --no agent-profiles update:*)",
+      "PowerShell(npx --no agent-profiles update:*)",
+      "Bash(npx --no agent-profiles migrate promote:*)",
+      "PowerShell(npx --no agent-profiles migrate promote:*)",
+      "Bash(npx --no agent-profiles revision record:*)",
+      "PowerShell(npx --no agent-profiles revision record:*)",
+      "Bash(npx --no agent-profiles init:*)",
+      "PowerShell(npx --no agent-profiles init:*)",
+      "Bash(npx --no agent-profiles uninstall:*)",
+      "PowerShell(npx --no agent-profiles uninstall:*)",
+      "Bash(agent-profiles library publish:*)",
+      "PowerShell(agent-profiles library publish:*)",
+      "Bash(agent-profiles library approve:*)",
+      "PowerShell(agent-profiles library approve:*)",
+      "Bash(agent-profiles add:*)",
+      "PowerShell(agent-profiles add:*)",
+      "Bash(agent-profiles install:*)",
+      "PowerShell(agent-profiles install:*)",
+      "Bash(agent-profiles update:*)",
+      "PowerShell(agent-profiles update:*)",
+      "Bash(agent-profiles migrate promote:*)",
+      "PowerShell(agent-profiles migrate promote:*)",
+      "Bash(agent-profiles revision record:*)",
+      "PowerShell(agent-profiles revision record:*)",
+      "Bash(agent-profiles init:*)",
+      "PowerShell(agent-profiles init:*)",
+      "Bash(agent-profiles uninstall:*)",
+      "PowerShell(agent-profiles uninstall:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx --no agent-profiles notice --hook claude"
+          }
+        ]
+      }
+    ]
+  }
+}

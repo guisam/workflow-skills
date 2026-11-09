@@ -1,0 +1,47 @@
+[
+  {
+    "source": "PLAN.md",
+    "file": "PLAN.md",
+    "sha256": "0a6b9a6f5546e7e3f744c984770df09be702eeaadc4bdcf7be72e52b76de25cc"
+  },
+  {
+    "source": "CHECKS.json",
+    "file": "CHECKS.json",
+    "sha256": "3eee5a8cc04ce6a67d3dd82d6717afa44dbe891a2f755aa98917fc4672ad989e"
+  },
+  {
+    "source": "CHECKS.scope.md",
+    "file": "CHECKS.scope.md",
+    "sha256": "5da8c351ab4744f1c9852f72d883b941110935307ca95e193bdb07c57407c67f"
+  },
+  {
+    "source": "PROVENANCE.json",
+    "file": "PROVENANCE.json",
+    "sha256": "153fb4bc0cf80eea92f0c0b5d0944efd3cc2647f1b203041924848f74f072a17"
+  },
+  {
+    "source": ".superpowers/sdd/PLAN/progress.md",
+    "file": "progress.md",
+    "sha256": "738841b57540a034ca37298bcff4094361bb74f4b09da2f9e291e6ad8a8fb51e"
+  },
+  {
+    "source": ".superpowers/sdd/PLAN/task-1-report.md",
+    "file": "task-1-report.md",
+    "sha256": "f5680af9f6499c91fa80fa8bc3c11a9700c0918e2302896814ae5043205fafd3"
+  },
+  {
+    "source": ".superpowers/sdd/PLAN/task-1-review.md",
+    "file": "task-1-review.md",
+    "sha256": "5b533871f5c043dfc0f6fef87f63de7c3cb7158a5563bf6188379446225564dd"
+  },
+  {
+    "source": ".superpowers/sdd/PLAN/final-review.md",
+    "file": "final-review.md",
+    "sha256": "70c33cb26ed5e209899c70d54eed40bcafd5224b9e5811cfb10750be6821aeee"
+  },
+  {
+    "source": ".superpowers/sdd/PLAN/review-25a4caf..1c0830a.diff",
+    "file": "review-25a4caf..1c0830a.diff",
+    "sha256": "8f653923be4cd4fd705ef37c6dc9b37e1a279eecc81f911e5b3037e023accc04"
+  }
+]

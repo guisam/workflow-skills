@@ -1,0 +1,56 @@
+default_profile: base
+default_role: implementer
+models: {}
+families: {}
+profiles:
+  base:
+    file: profiles/base.md
+roles:
+  implementer:
+    file: roles/implementer.md
+    skills:
+      required:
+        - ponytail-implementation
+        - shared-technical-language
+      available:
+        - ponytail-debt
+  reviewer:
+    file: roles/reviewer.md
+    skills:
+      required:
+        - ponytail-review
+        - shared-technical-language
+      available:
+        - ponytail-debt
+  auditor:
+    file: roles/auditor.md
+    skills:
+      required:
+        - ponytail-audit
+        - shared-technical-language
+      available:
+        - ponytail-debt
+  maintainer:
+    file: roles/maintainer.md
+    skills:
+      required:
+        - ponytail-debt
+        - shared-technical-language
+      available: []
+version: 2
+skills:
+  ponytail-implementation:
+    package: "@local/ponytail-implementation"
+    version: 1.0.0
+  ponytail-review:
+    package: "@local/ponytail-review"
+    version: 1.0.0
+  ponytail-audit:
+    package: "@local/ponytail-audit"
+    version: 1.0.0
+  ponytail-debt:
+    package: "@local/ponytail-debt"
+    version: 1.0.0
+  shared-technical-language:
+    package: "@local/shared-technical-language"
+    version: 1.0.0

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "agent-profiles": {
+      "command": "C:\\nvm4w\\nodejs\\node.exe",
+      "args": [
+        "C:/workspace/workflow-skills/node_modules/@guisam/agent-profiles/dist/bin/agent-profiles.js",
+        "mcp",
+        "--root",
+        "C:/workspace/workflow-skills",
+        "--host",
+        "claude"
+      ]
+    }
+  }
+}

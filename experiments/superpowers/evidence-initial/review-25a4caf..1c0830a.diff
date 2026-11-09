@@ -1,0 +1,39 @@
+# Review package: 25a4caf..HEAD
+
+## Commits
+1c0830a Handle empty prices in sumPrices
+
+## Files changed
+ sum-prices.mjs      |  2 +-
+ sum-prices.test.mjs | 12 ++++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+## Diff
+diff --git a/sum-prices.mjs b/sum-prices.mjs
+index 7bddc15..cf0ebb7 100644
+--- a/sum-prices.mjs
++++ b/sum-prices.mjs
+@@ -1 +1 @@
+-export const sumPrices = prices => prices.reduce((sum, price) => sum + price);
++export const sumPrices = prices => prices.reduce((sum, price) => sum + price, 0);
+diff --git a/sum-prices.test.mjs b/sum-prices.test.mjs
+index 7ef9906..69e3f51 100644
+--- a/sum-prices.test.mjs
++++ b/sum-prices.test.mjs
+@@ -1,4 +1,16 @@
+ import test from 'node:test';
+ import assert from 'node:assert/strict';
+ import {sumPrices} from './sum-prices.mjs';
+ test('adds prices',()=>assert.equal(sumPrices([2,3]),5));
++test('returns 0 for an empty array',()=>assert.equal(sumPrices([]),0));
++test('sums zero and negative prices',()=>{
++  assert.equal(sumPrices([0]),0);
++  assert.equal(sumPrices([0,0]),0);
++  assert.equal(sumPrices([-2,-3]),-5);
++  assert.equal(sumPrices([5,-2,0]),3);
++});
++test('does not modify the input array',()=>{
++  const prices=[2,-3,0];
++  sumPrices(prices);
++  assert.deepEqual(prices,[2,-3,0]);
++});

@@ -1,0 +1,11 @@
+schema_version: 1
+package:
+  name: "@local/ponytail-debt"
+  version: "1.0.0"
+  type: skill
+  license: MIT
+entrypoint: SKILL.md
+behavior:
+  delivery: instruction
+  hosts: []
+  effects: []

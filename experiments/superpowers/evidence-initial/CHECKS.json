@@ -1,0 +1,21 @@
+{
+  "project": "C:\\workspace\\workflow-skills\\.scratch\\superpowers-pjRH92",
+  "baseline": "25a4caf12432240ffca99f3d46317e5c656c3d94",
+  "workspace": "C:/workspace/workflow-skills/.scratch/superpowers-pjRH92/.superpowers/sdd/PLAN",
+  "brief": "C:\\workspace\\workflow-skills\\.scratch\\superpowers-pjRH92\\.superpowers\\sdd\\PLAN\\task-1-brief.md",
+  "checks": [
+    "claude/sp-coordinator: complete, only assigned required skill bodies",
+    "claude/sp-implementer: complete, only assigned required skill bodies",
+    "claude/sp-reviewer: complete, only assigned required skill bodies",
+    "codex/sp-coordinator: complete, only assigned required skill bodies",
+    "codex/sp-implementer: complete, only assigned required skill bodies",
+    "codex/sp-reviewer: complete, only assigned required skill bodies",
+    "Git Bash workspace ownership and Task 1 brief extraction passed",
+    "Review-package helper generated the setup diff; fixture working tree clean"
+  ],
+  "limits": [
+    "No live model or subagent run",
+    "No signed library publication",
+    "Native hook suppression requires live confirmation"
+  ]
+}
