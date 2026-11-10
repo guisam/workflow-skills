@@ -1,9 +1,8 @@
 # Project adapter design
 
-Status: **Implemented for AP 0.20.0 on an unmerged branch** (PR #96, stacked on
-PR #95). Not released. The live Agent-Profiles checkout has not been migrated; see
-the [live migration checklist](live-migration-checklist.md). Follow-ups:
-Agent-Profiles#97 (guarded updates) and #98 (stamps and evidence).
+Status: **Released and migrated on AP 0.22.0.** PRs #96/#99, #100 and #101
+implement the adapter, guarded updates (#97), and stamps/evidence (#98).
+See the [completed live migration record](live-migration-2026-11-10.md).
 Governing issue: [Agent-Profiles#85](https://github.com/guisam/Agent-Profiles/issues/85).
 Product contract: Agent-Profiles `docs/project-adapter.md` on that branch.
 

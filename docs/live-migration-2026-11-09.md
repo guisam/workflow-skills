@@ -2,6 +2,9 @@
 
 Status: release published; migration blocked by npm tarball availability.
 
+Historical record: the tarball later became available and its checksum matched.
+The migration was completed on 0.22.0; see [the follow-up](live-migration-2026-11-10.md).
+
 The maintainer authorized publication and migration in the T3 conversation after
 closing #97. This run targets **0.21.0**, superseding the prepared checklist's
 0.20.0 target. Existing unrelated product-checkout work must be preserved.

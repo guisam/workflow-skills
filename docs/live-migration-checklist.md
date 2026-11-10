@@ -1,6 +1,9 @@
 # Live migration checklist: Agent-Profiles dogfood → project adapter
 
-Status: **Prepared, not executed.** The live setup is unchanged. Each step marked
+Status: **Historical preparation checklist; executed using 0.22.0.** See
+[the completed migration record](live-migration-2026-11-10.md) for current state,
+evidence and rollback. The 0.20.0 references below describe the original plan.
+Each step marked
 **Gate** needs the user's explicit authorization at the time it is run.
 Governing issue: Agent-Profiles#85. Feature: AP 0.20.0 (PR #96, stacked on #95).
 Tool: [`scripts/adapter-migration.mjs`](../scripts/adapter-migration.mjs). Design:
