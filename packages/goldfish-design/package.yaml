@@ -1,0 +1,10 @@
+schema_version: 1
+package:
+  name: "@local/goldfish-design"
+  version: "0.1.0"
+  type: skill
+entrypoint: SKILL.md
+behavior:
+  delivery: instruction
+  hosts: []
+  effects: []

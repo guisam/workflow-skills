@@ -1,20 +1,25 @@
 # Workflow Skills
 
 Reusable workflow skills maintained independently of their consuming projects.
+This repository is also the user's root development workbench. The
+[elephant workflow](packages/elephant-workbench/SKILL.md) formalizes design
+conversations, fresh specification review and project-specific implementation
+handoffs. The signed packages are locally adopted by Agent-Profiles' explicit
+`elephant` role; see [startup and verification](docs/elephant-adoption.md).
 
 This repository is the **workshop** layer described in
 [Agent-Profiles#85](https://github.com/guisam/Agent-Profiles/issues/85):
 
 ```text
 workflow-skills (workshop: skill sources, packages, checks)
-  → <project>-config (adapter: adds pins and roles for one project; unreleased AP branch)
+  → <project>-config (adapter: adds pins and roles for one project)
     → project (product: owns its governing instructions and portable defaults)
 ```
 
 The workshop owns skill text, supporting references, package manifests,
 provenance, portability checks and usage examples. Agent Profiles (AP) delivers
 signed packages from the local library. Each consuming project selects and pins
-versions independently. The adapter layer is implemented on an unmerged AP branch;
+versions independently. The adapter layer is released and locally migrated on AP 0.22.0;
 see [adapter design](docs/adapter-design.md).
 
 Consuming projects must not depend on this repository's own `.agent-profiles/`
@@ -25,6 +30,9 @@ other projects.
 
 | Status | Package or asset | Notes |
 | --- | --- | --- |
+| Signed, locally adopted | `@local/elephant-workbench@0.1.0` | Required by Agent-Profiles' elephant role; see [skill](packages/elephant-workbench/SKILL.md) and [adoption](docs/elephant-adoption.md). Instruction delivery verified; live behavior untested |
+| Signed, locally adopted | `@local/delegate@0.1.0` | Available to Agent-Profiles' elephant role; see [delegation](docs/delegation.md). On-demand instruction delivery verified; live child behavior untested |
+| Signed, locally adopted | `@local/goldfish-comprehension@0.1.0`, `@local/goldfish-design@0.1.0`, `@local/goldfish-readiness@0.1.0` | Fresh specification-review roles for Sol 6.1 and Opus 5.5; see [usage and verification](docs/goldfish-adoption.md). Six role/model MCP deliveries verified; model behavior untested |
 | Stable, signed, adopted | `@local/shared-technical-language@1.0.0` | Extracted from Fraiche `adr-ste`; see [extraction](docs/extraction.md) |
 | Stable, signed, adopted | `@local/ponytail-implementation@1.0.0`, `ponytail-review`, `ponytail-audit`, `ponytail-debt` (all 1.0.0) | Derived from Ponytail (MIT); see [experiment](docs/ponytail-experiment.md) |
 | Trial only | [Superpowers role trial](experiments/superpowers/README.md): coordinator (orchestration), implementer (TDD), reviewer | Generated into `.scratch/` by `scripts/test-superpowers.mjs`; not packaged or signed |
